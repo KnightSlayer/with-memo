@@ -1,0 +1,45 @@
+{
+  "name": "@middlender/with-memo",
+  "version": "0.0.1",
+  "description": "High order function for memoization",
+  "main": "dist/with-memo.js",
+  "module": "dist/with-memo.mjs",
+  "types": "dist/with-memo.d.ts",
+  "scripts": {
+    "build": "tsup src/withMemo.ts --format cjs,esm --dts",
+    "lint": "tsc",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KnightSlayer/with-memo.git"
+  },
+  "keywords": [
+    "memo",
+    "cahce",
+    "memoization",
+    "HoF"
+  ],
+  "author": "Edgar Abgaryan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KnightSlayer/with-memo/issues"
+  },
+  "homepage": "https://github.com/KnightSlayer/with-memo#readme",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
+  },
+  "devDependencies": {
+    "@vitest/coverage-c8": "^0.28.4",
+    "tsup": "^6.6.0",
+    "typescript": "^4.9.5",
+    "vitest": "^0.28.4"
+  }
+}
