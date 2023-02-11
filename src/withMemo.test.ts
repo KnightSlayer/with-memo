@@ -1,8 +1,7 @@
 import { vi, describe, it, expect } from 'vitest'
 import { withMemo } from "./withMemo"
-import { ClassWithMemoizedMethods } from "./types";
 import { lru } from "./cacheReplacementStrategies/lru";
-import { memoizeClassMethods } from './memoizeClassMethods'
+import { extendClassAndMemoMethods } from './extendClassAndMemoMethods'
 
 describe("withMemo", () => {
   it("should call original function only ones and always return original result (no args)", () => {
@@ -242,13 +241,11 @@ describe("withMemo", () => {
       memoizedFn(n: number) {fn(n)}
     }
 
-    const MemoizedDummy = memoizeClassMethods(Dummy, ['memoizedFn'] as const, {
+    const MemoizedDummy = extendClassAndMemoMethods(Dummy, ['memoizedFn'] as const, {
       getContextKey: (context: unknown) => context
     })
 
-    type MemoizedDummy1 = ClassWithMemoizedMethods<Dummy, 'memoizedFn'>
-
-    const obj1 = new MemoizedDummy() as unknown as MemoizedDummy1;
+    const obj1 = new MemoizedDummy();
     const obj2 = new MemoizedDummy();
 
     obj1.memoizedFn(2);

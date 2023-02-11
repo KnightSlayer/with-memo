@@ -1,17 +1,15 @@
 import { ClassWithMemoizedMethods, WithMemoConfig, AnyClass } from "./types";
 import { withMemo } from './withMemo'
 
-type ConstructorOf<P extends AnyClass, R> = P extends {
-  new (...args:  infer A): infer R;
-} ? {
-  new (...args: A): R;
-} : never
-
-type ConstructorResultType<P extends AnyClass> = P extends {
+type ConstructorReturnType<P extends AnyClass> = P extends {
   new (...args:  any[]): infer Res;
 } ? Res: never
 
-export const memoizeClassMethods = <
+type ConstructorParameters<P extends AnyClass> = P extends {
+  new (...args: infer Params): any;
+} ? Params: never
+
+export const extendClassAndMemoMethods = <
   Class extends AnyClass,
   MethodsArr extends readonly string[] = [],
   Methods extends MethodsArr[number] = MethodsArr[number],
@@ -19,7 +17,9 @@ export const memoizeClassMethods = <
   OriginalClass: Class,
   methods: MethodsArr,
   memoConfig?: WithMemoConfig
-): ConstructorOf<Class, ClassWithMemoizedMethods<ConstructorResultType<Class>, Methods>> => {
+): {
+  new (...args: ConstructorParameters<Class>): ClassWithMemoizedMethods<ConstructorReturnType<Class>, Methods>
+} => {
   class MemoizedClass extends OriginalClass {}
 
   for (const method of methods) {
@@ -29,7 +29,9 @@ export const memoizeClassMethods = <
     (MemoizedClass as any).prototype[method] = withMemo(originalMethod, memoConfig)
   }
 
-  return MemoizedClass as unknown as ConstructorOf<Class, ClassWithMemoizedMethods<ConstructorResultType<Class>, Methods>>
+  return MemoizedClass as {
+    new (...args: ConstructorParameters<Class>): ClassWithMemoizedMethods<ConstructorReturnType<Class>, Methods>
+  }
 }
 
-export default memoizeClassMethods
+export default extendClassAndMemoMethods
