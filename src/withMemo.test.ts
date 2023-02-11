@@ -4,8 +4,6 @@ import { ClassWithMemoizedMethods } from "./types";
 import { lru } from "./cacheReplacementStrategies/lru";
 import { memoizeClassMethods } from './memoizeClassMethods'
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 describe("withMemo", () => {
   it("should call original function only ones and always return original result (no args)", () => {
       const result = Math.random();
@@ -131,19 +129,21 @@ describe("withMemo", () => {
   });
 
   it("ttl", async () => {
+    vi.useFakeTimers();
     const fn = vi.fn();
     const memoizedFn = withMemo(fn, { ttl: 1000 });
 
     memoizedFn();
     expect(fn).toHaveBeenCalledTimes(1);
-    await wait(500);
+    vi.advanceTimersByTime(500);
 
     memoizedFn();
     expect(fn).toHaveBeenCalledTimes(1);
-    await wait(500);
+    vi.advanceTimersByTime(500);
 
     memoizedFn();
     expect(fn).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
   });
 
   it("LRU", async () => {
@@ -156,26 +156,18 @@ describe("withMemo", () => {
     });
 
     memoizedFn(1, 2);
-    await wait(0);
     memoizedFn(1, 3);
-    await wait(0);
     memoizedFn(2, 3);
-    await wait(0);
     memoizedFn(1, 2);
     expect(fn).toHaveBeenCalledTimes(3);
-    await wait(0);
     memoizedFn(3, 3); // replace cache for (1, 3)
     expect(fn).toHaveBeenCalledTimes(4);
-    await wait(0);
     memoizedFn(1, 2);
     expect(fn).toHaveBeenCalledTimes(4);
-    await wait(0);
     memoizedFn(2, 3);
     expect(fn).toHaveBeenCalledTimes(4);
-    await wait(0);
     memoizedFn(3, 3);
     expect(fn).toHaveBeenCalledTimes(4);
-    await wait(0);
     memoizedFn(1, 3); // replace cache for (1, 2)
     expect(fn).toHaveBeenCalledTimes(5);
   });
@@ -288,4 +280,32 @@ describe("withMemo", () => {
     expect(memoizedFn(4, 4)).toBe(8);
     expect(fn).toHaveBeenCalledTimes(2);
   });
+
+  it("should throw an error when trying to call invalidateCacheByArgs when getContextKey is defined", () => {
+    const memoizedFn = withMemo(() => {}, {
+      getContextKey: (a: any) => a,
+    });
+    memoizedFn();
+    expect(() => memoizedFn.invalidateCacheByArgs()).toThrow(new Error("Use invalidateCacheByContextAndArgs instead"));
+  })
+
+  it("should throw an error when trying to call invalidateCacheByContextAndArgs when getContextKey isn't defined", () => {
+    const memoizedFn = withMemo(() => {});
+    memoizedFn();
+    expect(() => memoizedFn.invalidateCacheByContextAndArgs(null)).toThrow(new Error("Use invalidateCacheByArgs instead"));
+  })
+
+  it("should not fail if call invalidateCacheByArgs for uncached arguments", () => {
+    const memoizedFn = withMemo((a: number) => a);
+    expect(memoizedFn.invalidateCacheByArgs(1)).toBeUndefined();
+  })
+
+  it("should not fail if call invalidateCacheByContextAndArgs for uncached arguments", () => {
+    const memoizedFn = withMemo((a: number) => a, {
+      getContextKey: (a: any) => a,
+    });
+    expect(memoizedFn.invalidateCacheByContextAndArgs(null,1)).toBeUndefined();
+    memoizedFn.call(null, 1)
+    expect(memoizedFn.invalidateCacheByContextAndArgs(null,2)).toBeUndefined();
+  })
 })

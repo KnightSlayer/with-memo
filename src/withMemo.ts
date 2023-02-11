@@ -119,6 +119,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
     let currentCache = rootCache;
     const cotextKey = getContextKey(context);
     currentCache = currentCache.subCaches.get(cotextKey);
+    if (!currentCache) return;
 
     for (const arg of transformArgs(args)) {
       const cacheKey = getKey(arg);

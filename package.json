@@ -6,7 +6,7 @@
   "module": "dist/with-memo.mjs",
   "types": "dist/with-memo.d.ts",
   "scripts": {
-    "build": "tsup src/withMemo.ts --format cjs,esm --dts",
+    "build": "tsup src/*.ts src/**/*.ts --format cjs,esm --dts",
     "lint": "tsc",
     "test": "vitest",
     "coverage": "vitest run --coverage"
