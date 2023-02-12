@@ -22,7 +22,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
   });
 
   const rootCache = createSubCache();
-  const allCacheRecords = new Set();
+  const allCacheRecords = new Set<CacheData>();
 
   const invalidateByCache = (theCache: CacheData) => {
     if (theCache.invalidationTimeoutId) {
@@ -93,6 +93,13 @@ export const withMemo = <OriginFn extends AnyFunction>(
   };
 
   memoizedFn.invalidateCache = () => {
+    if (ttl != null) {
+      allCacheRecords.forEach(cacheData => {
+        if (cacheData.invalidationTimeoutId) {
+          clearTimeout(cacheData.invalidationTimeoutId)
+        }
+      })
+    }
     allCacheRecords.clear();
     Object.assign(rootCache, createSubCache());
   };

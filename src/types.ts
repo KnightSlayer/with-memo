@@ -25,8 +25,8 @@ export interface CacheData<R = unknown> {
   invalidationTimeoutId: ReturnType<typeof setTimeout> | null,
   hits: Hit[]
 }
-export type CacheReplacementStrategy = {
-  (cache: any): any[]
+export type CacheReplacementStrategy<T extends {hits: Hit[]} = {hits: Hit[]}> = {
+  (caches: Set<T>): T[]
 }
 
 export type WithMemoConfig = {
@@ -37,7 +37,7 @@ export type WithMemoConfig = {
   cacheRejectedPromise?: boolean;
   cacheReplacementPolicy?: {
     maxSize: number;
-    strategy: CacheReplacementStrategy;
+    strategy: CacheReplacementStrategy<CacheData>;
   };
   transformArgs?: (args: unknown[]) => unknown[];
 };
