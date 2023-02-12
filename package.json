@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsup src/*.ts src/**/*.ts --format cjs,esm --dts",
     "lint": "tsc",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "coverage": "vitest run --coverage"
   },
   "repository": {

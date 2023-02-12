@@ -1,10 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { lru } from './lru'
-import { Hit } from "../types";
 
 describe('cacheReplacementStrategies: LRU', () => {
   it('should handle empty set', () => {
-    expect(lru(new Set())).toEqual([])
+    expect(lru([])).toEqual([])
   })
 
   it('should return least recently used', () => {
@@ -45,9 +44,8 @@ describe('cacheReplacementStrategies: LRU', () => {
         timestamp: 7,
       }]
     }
-    const cachesSet = new Set<{id: number, hits: Hit[]}>([item1, item2, item3, item4])
 
-    const res = lru(cachesSet)
+    const res = lru([item1, item2, item3, item4])
     expect(res.length).toBe(1)
     expect(res[0]).toBe(item2)
   })

@@ -1,4 +1,5 @@
 import { WithMemoConfig, MemoizedFunction, CacheData, AnyFunction } from "./types";
+import { getAllCacheRecords } from './getAllCacheRecords';
 
 export const withMemo = <OriginFn extends AnyFunction>(
   originFn: OriginFn,
@@ -22,7 +23,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
   });
 
   const rootCache = createSubCache();
-  const allCacheRecords = new Set<CacheData>();
+  let cacheSize = 0;
 
   const invalidateByCache = (theCache: CacheData) => {
     if (theCache.invalidationTimeoutId) {
@@ -32,7 +33,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
     theCache.result = null;
     theCache.invalidationTimeoutId = null;
     theCache.hits = [];
-    allCacheRecords.delete(theCache);
+    cacheSize--;
   };
 
   const memoizedFn = function (this: unknown, ...args: Parameters<OriginFn>): ReturnType<OriginFn> {
@@ -62,9 +63,14 @@ export const withMemo = <OriginFn extends AnyFunction>(
           maxSize,
           strategy,
         } = cacheReplacementPolicy;
-        if (allCacheRecords.size >= maxSize) {
-          const cachesToReplace = strategy(allCacheRecords);
-          cachesToReplace.forEach(invalidateByCache);
+        if (cacheSize >= maxSize) {
+          const allCacheRecords = getAllCacheRecords(rootCache)
+          cacheSize = allCacheRecords.length
+
+          if (cacheSize >= maxSize) {
+            const cachesToReplace = strategy(allCacheRecords) as CacheData[];
+            cachesToReplace.forEach(invalidateByCache);
+          }
         }
       }
       currentCache.result = originFn.call(this, ...args) as ReturnType<OriginFn>;
@@ -76,7 +82,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
           ttl
         );
       }
-      allCacheRecords.add(currentCache);
+      cacheSize++;
     }
     currentCache.hits.push({
       index: nextHitIndex++,
@@ -94,13 +100,13 @@ export const withMemo = <OriginFn extends AnyFunction>(
 
   memoizedFn.invalidateCache = () => {
     if (ttl != null) {
-      allCacheRecords.forEach(cacheData => {
+      getAllCacheRecords(rootCache).forEach(cacheData => {
         if (cacheData.invalidationTimeoutId) {
           clearTimeout(cacheData.invalidationTimeoutId)
         }
       })
     }
-    allCacheRecords.clear();
+    cacheSize = 0;
     Object.assign(rootCache, createSubCache());
   };
 
@@ -116,7 +122,6 @@ export const withMemo = <OriginFn extends AnyFunction>(
       if (!currentCache) return;
     }
 
-    allCacheRecords.delete(currentCache);
     invalidateByCache(currentCache);
   };
 
@@ -135,7 +140,6 @@ export const withMemo = <OriginFn extends AnyFunction>(
       if (!currentCache) return;
     }
 
-    allCacheRecords.delete(currentCache);
     invalidateByCache(currentCache);
   };
 

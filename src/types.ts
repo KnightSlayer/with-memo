@@ -4,7 +4,7 @@ export type AnyClass = {
 export type AnyFunction = (this: any, ...args: any[]) => any
 
 export interface CacheStore<K = any, V = any> {
-  // forEach(cb: (value: V, key: K, cacheStore: CacheStore) => void, thisArg?: unknown): void;
+  forEach(cb: (value: V, key: K, cacheStore: CacheStore) => void, thisArg?: unknown): void;
   // clear(): void;
   // delete(key: K): boolean;
   get(key: K): V;
@@ -26,7 +26,7 @@ export interface CacheData<R = unknown> {
   hits: Hit[]
 }
 export type CacheReplacementStrategy<T extends {hits: Hit[]} = {hits: Hit[]}> = {
-  (caches: Set<T>): T[]
+  (caches: T[]): T[]
 }
 
 export type WithMemoConfig = {
@@ -37,7 +37,7 @@ export type WithMemoConfig = {
   cacheRejectedPromise?: boolean;
   cacheReplacementPolicy?: {
     maxSize: number;
-    strategy: CacheReplacementStrategy<CacheData>;
+    strategy: CacheReplacementStrategy;
   };
   transformArgs?: (args: unknown[]) => unknown[];
 };
