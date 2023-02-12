@@ -5,16 +5,16 @@ export const getAllCacheRecords = (rootCache: CacheData): CacheData[] => {
   const allCacheRecords: CacheData[] = [];
 
   while (stack.length) {
-    const cacheData = stack.pop()!
+    const cacheData = stack.pop()!;
 
     if (cacheData.isCached) {
-      allCacheRecords.push(cacheData)
+      allCacheRecords.push(cacheData);
     }
 
-    cacheData.subCaches.forEach(cacheData => stack.push(cacheData))
+    cacheData.subCaches.forEach((cacheData) => stack.push(cacheData));
   }
 
   return allCacheRecords;
-}
+};
 
-export default getAllCacheRecords
+export default getAllCacheRecords;

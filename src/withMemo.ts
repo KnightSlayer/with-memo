@@ -1,5 +1,5 @@
 import { WithMemoConfig, MemoizedFunction, CacheData, AnyFunction } from "./types";
-import { getAllCacheRecords } from './getAllCacheRecords';
+import { getAllCacheRecords } from "./getAllCacheRecords";
 
 export const withMemo = <OriginFn extends AnyFunction>(
   originFn: OriginFn,
@@ -10,8 +10,8 @@ export const withMemo = <OriginFn extends AnyFunction>(
     cacheRejectedPromise = false,
     ttl,
     cacheReplacementPolicy,
-    transformArgs = (args) => args
-  }: WithMemoConfig = {}
+    transformArgs = (args) => args,
+  }: WithMemoConfig = {},
 ): MemoizedFunction<OriginFn> => {
   let nextHitIndex = 1;
   const createSubCache = (): CacheData<ReturnType<OriginFn>> => ({
@@ -19,7 +19,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
     result: null,
     isCached: false,
     invalidationTimeoutId: null,
-    hits: []
+    hits: [],
   });
 
   const rootCache = createSubCache();
@@ -64,8 +64,8 @@ export const withMemo = <OriginFn extends AnyFunction>(
           strategy,
         } = cacheReplacementPolicy;
         if (cacheSize >= maxSize) {
-          const allCacheRecords = getAllCacheRecords(rootCache)
-          cacheSize = allCacheRecords.length
+          const allCacheRecords = getAllCacheRecords(rootCache);
+          cacheSize = allCacheRecords.length;
 
           if (cacheSize >= maxSize) {
             const cachesToReplace = strategy(allCacheRecords) as CacheData[];
@@ -79,7 +79,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
       if (ttl != null) {
         currentCache.invalidationTimeoutId = setTimeout(
           () => invalidateByCache(currentCache),
-          ttl
+          ttl,
         );
       }
       cacheSize++;
@@ -91,7 +91,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
 
     if (!cacheRejectedPromise) {
       Promise.resolve(currentCache.result).catch(() =>
-        invalidateByCache(currentCache)
+        invalidateByCache(currentCache),
       );
     }
 
@@ -100,11 +100,11 @@ export const withMemo = <OriginFn extends AnyFunction>(
 
   memoizedFn.invalidateCache = () => {
     if (ttl != null) {
-      getAllCacheRecords(rootCache).forEach(cacheData => {
+      getAllCacheRecords(rootCache).forEach((cacheData) => {
         if (cacheData.invalidationTimeoutId) {
-          clearTimeout(cacheData.invalidationTimeoutId)
+          clearTimeout(cacheData.invalidationTimeoutId);
         }
-      })
+      });
     }
     cacheSize = 0;
     Object.assign(rootCache, createSubCache());
@@ -143,7 +143,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
     invalidateByCache(currentCache);
   };
 
-  return memoizedFn
+  return memoizedFn;
 };
 
-export default withMemo
+export default withMemo;

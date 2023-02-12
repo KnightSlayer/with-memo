@@ -6,10 +6,10 @@ export const lru: CacheReplacementStrategy = <T extends {hits: Hit[]} = {hits: H
       const aIndex = a.hits.at(-1)?.index || 0;
       const bIndex = b.hits.at(-1)?.index || 0;
 
-      return aIndex - bIndex
-    })
+      return aIndex - bIndex;
+    });
 
-  return asArr.slice(0, 1)
-}
+  return asArr.slice(0, 1);
+};
 
-export default lru
+export default lru;
