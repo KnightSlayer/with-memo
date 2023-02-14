@@ -1,4 +1,4 @@
-import { WithMemoConfig, MemoizedFunction, CacheData, AnyFunction } from "./types";
+import type { WithMemoConfig, MemoizedFunction, CacheData, AnyFunction } from "./types";
 import { getAllCacheRecords } from "./getAllCacheRecords";
 
 export const withMemo = <OriginFn extends AnyFunction>(
@@ -95,9 +95,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
       );
     }
 
-    if (!currentCache.result) throw new Error("Something went really wrong");
-
-    return currentCache.result;
+    return currentCache.result!;
   };
 
   memoizedFn.invalidateCache = () => {

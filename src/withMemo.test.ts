@@ -209,7 +209,7 @@ describe("withMemo", () => {
         this.y = y;
       }
 
-      doubleX(this: Point) {
+      public doubleX(this: Point) {
         return this.x * 2;
       }
     }
@@ -238,7 +238,7 @@ describe("withMemo", () => {
   it("invalidate with context", () => {
     const fn = vi.fn();
     class Dummy {
-      memoizedFn(n: number) {fn(n);}
+      public memoizedFn(n: number) {fn(n);}
     }
 
     const MemoizedDummy = extendClassAndMemoMethods(Dummy, ["memoizedFn"] as const, {

@@ -10,7 +10,7 @@ describe("extendClassAndMemoMethods", () => {
   it("should memoize method for new class(constructor)", () => {
     const fn = vi.fn();
     class A {
-      method() {
+      public method() {
         fn();
       }
     }
@@ -36,8 +36,8 @@ describe("extendClassAndMemoMethods", () => {
     const fn = vi.fn();
 
     class A {
-      method() {}
-      untouchedMethod() {
+      public method() {}
+      public untouchedMethod() {
         fn();
       }
     }
@@ -54,7 +54,7 @@ describe("extendClassAndMemoMethods", () => {
   it("should throw an error if trying to memoize none function property", () => {
     class A {
       public name?: string;
-      method() {}
+      public method() {}
     }
 
     expect(() => extendClassAndMemoMethods(A, ["name"] as const)).toThrow(new Error("Trying to memoize a non-function"));

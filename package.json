@@ -44,6 +44,7 @@
     "@typescript-eslint/parser": "^5.51.0",
     "@vitest/coverage-c8": "^0.28.4",
     "eslint": "^8.34.0",
+    "eslint-plugin-import": "^2.27.5",
     "husky": "^8.0.0",
     "lint-staged": "^13.1.2",
     "tsup": "^6.6.0",

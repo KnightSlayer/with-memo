@@ -1,4 +1,4 @@
-import { CacheData } from "./types";
+import type { CacheData } from "./types";
 
 export const getAllCacheRecords = (rootCache: CacheData): CacheData[] => {
   const stack = [rootCache];

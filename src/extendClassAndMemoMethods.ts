@@ -1,4 +1,4 @@
-import { ClassWithMemoizedMethods, WithMemoConfig, AnyClass } from "./types";
+import type { ClassWithMemoizedMethods, WithMemoConfig, AnyClass } from "./types";
 import { withMemo } from "./withMemo";
 
 type ConstructorReturnType<P extends AnyClass> = P extends {
