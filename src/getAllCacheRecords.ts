@@ -5,7 +5,8 @@ export const getAllCacheRecords = (rootCache: CacheData): CacheData[] => {
   const allCacheRecords: CacheData[] = [];
 
   while (stack.length) {
-    const cacheData = stack.pop()!;
+    const cacheData = stack.pop();
+    if (!cacheData) throw new Error("Something went really wrong");
 
     if (cacheData.isCached) {
       allCacheRecords.push(cacheData);

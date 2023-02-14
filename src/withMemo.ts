@@ -95,7 +95,9 @@ export const withMemo = <OriginFn extends AnyFunction>(
       );
     }
 
-    return currentCache.result!;
+    if (!currentCache.result) throw new Error("Something went really wrong");
+
+    return currentCache.result;
   };
 
   memoizedFn.invalidateCache = () => {
