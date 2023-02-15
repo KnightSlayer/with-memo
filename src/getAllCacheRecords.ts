@@ -12,7 +12,7 @@ export const getAllCacheRecords = (rootCache: CacheData): CacheData[] => {
       allCacheRecords.push(cacheData);
     }
 
-    cacheData.subCaches.forEach((cacheData) => stack.push(cacheData));
+    cacheData.subCaches.forEach((subCacheData) => stack.push(subCacheData));
   }
 
   return allCacheRecords;
