@@ -1,5 +1,6 @@
 import type { CacheReplacementStrategy, Hit } from "../types";
 
+// Most Recently Used
 export const mru: CacheReplacementStrategy = <T extends {hits: Hit[]} = {hits: Hit[]}>(items: T[]): T[] => {
   const asArr = [...items]
     .sort((a, b) => {
