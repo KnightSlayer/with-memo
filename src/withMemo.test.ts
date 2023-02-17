@@ -238,7 +238,9 @@ describe("withMemo", () => {
   it("invalidate with context", () => {
     const fn = vi.fn();
     class Dummy {
-      public memoizedFn(n: number) {fn(n);}
+      public memoizedFn(n: number) {
+        fn(n);
+      }
     }
 
     const MemoizedDummy = extendClassAndMemoMethods(Dummy, ["memoizedFn"] as const, {
@@ -301,8 +303,8 @@ describe("withMemo", () => {
     const memoizedFn = withMemo((a: number) => a, {
       getContextKey: (a: any) => a,
     });
-    expect(memoizedFn.invalidateCacheByContextAndArgs(null,1)).toBeUndefined();
+    expect(memoizedFn.invalidateCacheByContextAndArgs(null, 1)).toBeUndefined();
     memoizedFn.call(null, 1);
-    expect(memoizedFn.invalidateCacheByContextAndArgs(null,2)).toBeUndefined();
+    expect(memoizedFn.invalidateCacheByContextAndArgs(null, 2)).toBeUndefined();
   });
 });

@@ -6,7 +6,7 @@ export type AnyFunction = (this: any, ...args: any[]) => any
 export interface CacheStore<K = any, V = any> {
   forEach(cb: (value: V, key: K, cacheStore: CacheStore) => void, thisArg?: unknown): void;
   // clear(): void;
-  // delete(key: K): boolean;
+  delete(key: K): boolean;
   get(key: K): V;
   has(key: K): boolean;
   set(key: K, value: V): this;
@@ -23,7 +23,9 @@ export interface CacheData<R = unknown> {
   result: R | null,
   isCached: boolean,
   invalidationTimeoutId: ReturnType<typeof setTimeout> | null,
-  hits: Hit[]
+  hits: Hit[],
+  previousCache?: CacheData<R>
+  keyInPreviousCache?: unknown,
 }
 export type CacheReplacementStrategy<T extends {hits: Hit[]} = {hits: Hit[]}> = {
   (caches: T[]): T[]

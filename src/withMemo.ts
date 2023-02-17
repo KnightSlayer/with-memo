@@ -14,26 +14,37 @@ export const withMemo = <OriginFn extends AnyFunction>(
   }: WithMemoConfig = {},
 ): MemoizedFunction<OriginFn> => {
   let nextHitIndex = 1;
-  const createSubCache = (): CacheData<ReturnType<OriginFn>> => ({
+  const createSubCache = (previousCache?: CacheData<ReturnType<OriginFn>>, keyInPreviousCache?: unknown): CacheData<ReturnType<OriginFn>> => ({
     subCaches: getCacheStore(),
     result: null,
     isCached: false,
     invalidationTimeoutId: null,
     hits: [],
+    previousCache,
+    keyInPreviousCache,
   });
 
   const rootCache = createSubCache();
   let cacheSize = 0;
 
   const invalidateByCache = (theCache: CacheData) => {
-    if (theCache.invalidationTimeoutId) {
-      clearTimeout(theCache.invalidationTimeoutId);
+    if (theCache.isCached) {
+      if (theCache.invalidationTimeoutId) {
+        clearTimeout(theCache.invalidationTimeoutId);
+      }
+      theCache.isCached = false;
+      theCache.result = null;
+      theCache.invalidationTimeoutId = null;
+      theCache.hits = [];
+      cacheSize--;
     }
-    theCache.isCached = false;
-    theCache.result = null;
-    theCache.invalidationTimeoutId = null;
-    theCache.hits = [];
-    cacheSize--;
+
+    if (!theCache.previousCache) return;
+    if (theCache.subCaches.size > 0) return;
+    theCache.previousCache.subCaches.delete(theCache.keyInPreviousCache);
+
+    if (theCache.previousCache.isCached) return;
+    invalidateByCache(theCache.previousCache);
   };
 
   const memoizedFn = function (this: unknown, ...args: Parameters<OriginFn>): ReturnType<OriginFn> {
@@ -42,7 +53,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
     if (getContextKey) {
       const cacheKey = getContextKey(this);
       if (!currentCache.subCaches.has(cacheKey)) {
-        currentCache.subCaches.set(cacheKey, createSubCache());
+        currentCache.subCaches.set(cacheKey, createSubCache(currentCache, cacheKey));
       }
 
       currentCache = currentCache.subCaches.get(cacheKey);
@@ -51,7 +62,7 @@ export const withMemo = <OriginFn extends AnyFunction>(
     for (const arg of transformArgs(args)) {
       const cacheKey = getKey(arg);
       if (!currentCache.subCaches.has(cacheKey)) {
-        currentCache.subCaches.set(cacheKey, createSubCache());
+        currentCache.subCaches.set(cacheKey, createSubCache(currentCache, cacheKey));
       }
 
       currentCache = currentCache.subCaches.get(cacheKey);
