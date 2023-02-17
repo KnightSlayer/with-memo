@@ -1,6 +1,7 @@
 import type { WithMemoConfig, MemoizedFunction, CacheData, AnyFunction } from "./types";
 import { getAllCacheRecords } from "./getAllCacheRecords";
 
+// test
 export const withMemo = <OriginFn extends AnyFunction>(
   originFn: OriginFn,
   {
