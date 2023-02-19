@@ -24,6 +24,7 @@ describe("cacheReplacementStrategies: LFU", () => {
         timestamp: 1,
       }],
     };
+    // test
     const item3 = {
       id: 3,
       hits: [{
@@ -43,3 +44,4 @@ describe("cacheReplacementStrategies: LFU", () => {
     expect(res[0]).toBe(item2);
   });
 });
+
