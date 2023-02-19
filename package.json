@@ -1,10 +1,10 @@
 {
   "name": "@eabgaryan/with-memo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "High order function for memoization",
-  "main": "dist/with-memo.js",
-  "module": "dist/with-memo.mjs",
-  "types": "dist/with-memo.d.ts",
+  "main": "dist/withMemo.js",
+  "module": "dist/withMemo.mjs",
+  "types": "dist/withMemo.d.ts",
   "scripts": {
     "prepare": "husky install",
     "build": "tsup src/*.ts src/**/*.ts --format cjs,esm --dts",
