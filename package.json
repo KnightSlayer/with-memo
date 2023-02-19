@@ -1,5 +1,5 @@
 {
-  "name": "@middlender/with-memo",
+  "name": "@eabgaryan/with-memo",
   "version": "0.0.1",
   "description": "High order function for memoization",
   "main": "dist/with-memo.js",
