@@ -2,7 +2,7 @@ const cacheReplacementStrategies = {
   lru: (itemsSet) => {
     const asArray = Array.from(itemsSet)
       .sort((a, b) => a.hits.at(-1) - b.hits.at(-1));
-    
+
     return asArray.slice(0, 1);
   },
 };
@@ -30,7 +30,6 @@ export const withMemo = (
   });
 
   const rootCache = createSubCache();
-
   const allCacheRecords = new Set();
 
   const invalidateByCache = (theCache) => {
@@ -42,7 +41,7 @@ export const withMemo = (
     allCacheRecords.delete(theCache);
   };
 
-  return (...args) => {
+  const memoizedFn = (...args) => {
     let currentCache = rootCache;
 
     for (const arg of args) {
@@ -87,4 +86,29 @@ export const withMemo = (
 
     return currentCache.result;
   };
+
+  memoizedFn.invalidateCache = () => {
+    if (ttl != null) {
+      allCacheRecords.forEach(
+        (cacheData) => clearTimeout(cacheData.invalidationTimeoutId),
+      );
+    }
+    allCacheRecords.clear();
+    Object.assign(rootCache, createSubCache());
+  };
+
+  memoizedFn.invalidateCacheByArgs = (...args) => {
+    let currentCache = rootCache;
+
+    for (const arg of args) {
+      const cacheKey = getKey(arg);
+
+      currentCache = currentCache.subCaches.get(cacheKey);
+      if (!currentCache) return;
+    }
+
+    invalidateByCache(currentCache);
+  };
+
+  return memoizedFn;
 };
