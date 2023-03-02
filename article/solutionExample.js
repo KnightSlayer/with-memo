@@ -1,6 +1,10 @@
-export const withMemo = (originFn, { getKey = (arg) => arg } = {}) => {
-  const cache = new Map();
-
+export const withMemo = (
+  originFn,
+  {
+    getKey = (arg) => arg,
+    cache = new Map(),
+  } = {},
+) => {
   return (arg) => {
     const cacheKey = getKey(arg);
 
