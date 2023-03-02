@@ -2,25 +2,42 @@ export const withMemo = (
   originFn,
   {
     getKey = (arg) => arg,
-    cache = new Map(),
+    getCacheStore = () => new Map(),
     cacheRejectedPromise = false,
   } = {},
 ) => {
-  return (arg) => {
-    const cacheKey = getKey(arg);
+  const createSubCache = () => ({
+    subCaches: getCacheStore(),
+    result: null,
+    isCached: false,
+  });
 
-    if (!cache.has(cacheKey)) {
-      cache.set(cacheKey, originFn(arg));
+  const rootCache = createSubCache();
+
+  return (...args) => {
+    let currentCache = rootCache;
+
+    for (const arg of args) {
+      const cacheKey = getKey(arg);
+      if (!currentCache.subCaches.has(cacheKey)) {
+        currentCache.subCaches.set(cacheKey, createSubCache());
+      }
+
+      currentCache = currentCache.subCaches.get(cacheKey);
     }
 
-    const cachedValue = cache.get(cacheKey);
+    if (!currentCache.isCached) {
+      currentCache.result = originFn(...args);
+      currentCache.isCached = true;
+    }
 
     if (!cacheRejectedPromise) {
-      Promise.resolve(cachedValue).catch(() => {
-        cache.delete(cacheKey);
+      Promise.resolve(currentCache.result).catch(() => {
+        currentCache.isCached = false;
+        currentCache.result = null;
       });
     }
 
-    return cachedValue;
+    return currentCache.result;
   };
 };
