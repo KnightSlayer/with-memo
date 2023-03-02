@@ -1,11 +1,13 @@
-export const withMemo = (originFn) => {
-  const cache = {};
+export const withMemo = (originFn, { getKey = (arg) => arg } = {}) => {
+  const cache = new Map();
 
   return (arg) => {
-    if (!(arg in cache)) {
-      cache[arg] = originFn(arg);
+    const cacheKey = getKey(arg);
+
+    if (!cache.has(cacheKey)) {
+      cache.set(cacheKey, originFn(arg));
     }
 
-    return cache[arg];
+    return cache.get(cacheKey);
   };
 };
