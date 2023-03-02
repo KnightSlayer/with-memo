@@ -1,11 +1,15 @@
 export const withMemo = (originFn) => {
-  let cache;
+  const cache = {
+    value: undefined,
+    isCached: false,
+  };
 
   return () => {
-    if (cache === undefined) {
-      cache = originFn();
+    if (!cache.isCached) {
+      cache.value = originFn();
+      cache.isCached = true;
     }
 
-    return cache;
+    return cache.value;
   };
 };
