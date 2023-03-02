@@ -3,6 +3,7 @@ export const withMemo = (
   {
     getKey = (arg) => arg,
     cache = new Map(),
+    cacheRejectedPromise = false,
   } = {},
 ) => {
   return (arg) => {
@@ -12,6 +13,14 @@ export const withMemo = (
       cache.set(cacheKey, originFn(arg));
     }
 
-    return cache.get(cacheKey);
+    const cachedValue = cache.get(cacheKey);
+
+    if (!cacheRejectedPromise) {
+      Promise.resolve(cachedValue).catch(() => {
+        cache.delete(cacheKey);
+      });
+    }
+
+    return cachedValue;
   };
 };
