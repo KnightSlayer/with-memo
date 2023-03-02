@@ -11,6 +11,7 @@ export const withMemo = (
   originFn,
   {
     getKey = (arg) => arg,
+    getContextKey = null,
     getCacheStore = () => new Map(),
     cacheRejectedPromise = false,
     ttl,
@@ -41,8 +42,17 @@ export const withMemo = (
     allCacheRecords.delete(theCache);
   };
 
-  const memoizedFn = (...args) => {
+  const memoizedFn = function (...args) {
     let currentCache = rootCache;
+
+    if (getContextKey) {
+      const cacheKey = getContextKey(this);
+      if (!currentCache.subCaches.has(cacheKey)) {
+        currentCache.subCaches.set(cacheKey, createSubCache());
+      }
+
+      currentCache = currentCache.subCaches.get(cacheKey);
+    }
 
     for (const arg of args) {
       const cacheKey = getKey(arg);
@@ -64,8 +74,7 @@ export const withMemo = (
           cachesToReplace.forEach(invalidateByCache);
         }
       }
-
-      currentCache.result = originFn(...args);
+      currentCache.result = originFn.call(this, ...args);
       currentCache.isCached = true;
 
       if (ttl != null) {
@@ -98,7 +107,27 @@ export const withMemo = (
   };
 
   memoizedFn.invalidateCacheByArgs = (...args) => {
+    if (getContextKey) throw new Error("Use invalidateCacheByContextAndArgs instead");
+
     let currentCache = rootCache;
+
+    for (const arg of args) {
+      const cacheKey = getKey(arg);
+
+      currentCache = currentCache.subCaches.get(cacheKey);
+      if (!currentCache) return;
+    }
+
+    invalidateByCache(currentCache);
+  };
+
+  memoizedFn.invalidateCacheByContextAndArgs = (context, ...args) => {
+    if (!getContextKey) throw new Error("Use invalidateCacheByArgs instead");
+
+    let currentCache = rootCache;
+    const contextKey = getContextKey(context);
+    currentCache = currentCache.subCaches.get(contextKey);
+    if (!currentCache) return;
 
     for (const arg of args) {
       const cacheKey = getKey(arg);
