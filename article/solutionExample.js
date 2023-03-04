@@ -16,6 +16,7 @@ export const withMemo = (
     cacheRejectedPromise = false,
     ttl,
     cacheReplacementPolicy = null,
+    transformArgs = (args) => args,
   } = {},
 ) => {
   if (cacheReplacementPolicy && !cacheReplacementPolicy.maxSize) {
@@ -54,7 +55,7 @@ export const withMemo = (
       currentCache = currentCache.subCaches.get(cacheKey);
     }
 
-    for (const arg of args) {
+    for (const arg of transformArgs(...args)) {
       const cacheKey = getKey(arg);
       if (!currentCache.subCaches.has(cacheKey)) {
         currentCache.subCaches.set(cacheKey, createSubCache());
@@ -111,7 +112,7 @@ export const withMemo = (
 
     let currentCache = rootCache;
 
-    for (const arg of args) {
+    for (const arg of transformArgs(...args)) {
       const cacheKey = getKey(arg);
 
       currentCache = currentCache.subCaches.get(cacheKey);
@@ -129,7 +130,7 @@ export const withMemo = (
     currentCache = currentCache.subCaches.get(contextKey);
     if (!currentCache) return;
 
-    for (const arg of args) {
+    for (const arg of transformArgs(...args)) {
       const cacheKey = getKey(arg);
 
       currentCache = currentCache.subCaches.get(cacheKey);
