@@ -1,6 +1,6 @@
 {
   "name": "@eabgaryan/with-memo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "High order function for memoization",
   "main": "dist/withMemo.js",
   "module": "dist/withMemo.mjs",
