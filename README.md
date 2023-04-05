@@ -1,5 +1,5 @@
 # Higher Order Function withMemo
-This library is result of this article: --link--
+This library is result of this article: [english](https://medium.com/better-programming/learn-javascript-by-implementing-memoization-394274485547), [русский](https://habr.com/ru/articles/720594/)
 
 `withMemo` is a dependency-free JavaScript library for memoizing functions. It is designed to improve the performance of expensive function calls by caching and reusing results for repeated calls with the same arguments. It supports various configuration options, such as custom cache keys, time-to-live (TTL) settings, and cache replacement policies.
 
